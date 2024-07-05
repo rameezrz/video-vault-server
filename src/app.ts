@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-// import userRoutes from './routes/userRoutes';
-// app.use('/api/users', userRoutes);
+import authRoutes from "./routes/authRoutes";
+app.use("/api/auth", authRoutes);
 
 export default app;
