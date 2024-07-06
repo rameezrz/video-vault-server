@@ -1,5 +1,5 @@
 import express from "express";
-import cookieParser from 'cookie-parser';
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 
@@ -13,6 +13,9 @@ app.use(express.json());
 
 // Routes
 import authRoutes from "./routes/authRoutes";
+app.get("/", (req, res) => {
+  res.status(200).send("Welcome to Video-Vault API...");
+});
 app.use("/api/auth", authRoutes);
 
 export default app;
