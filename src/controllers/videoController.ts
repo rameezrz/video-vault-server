@@ -26,3 +26,20 @@ export const uploadVideo = async (req: AuthenticatedRequest, res: Response) => {
     res.status(403).json({ message: "Error Creating Video", error });
   }
 };
+
+export const getUserVideos = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
+  const { userId } = req.user;
+
+  try {
+    const videos = await Video.find({ userId });
+
+    res.status(200).json({
+      videos,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching videos", error });
+  }
+};
