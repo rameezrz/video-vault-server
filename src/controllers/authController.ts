@@ -30,7 +30,6 @@ export const registerUser = async (req: Request, res: Response) => {
     }
 
     const password = `${firstName.slice(0, 2)}${lastName.slice(-2)}${mobile}`;
-    console.log(`Generated password: ${password}`);
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -45,7 +44,6 @@ export const registerUser = async (req: Request, res: Response) => {
     await newUser.save();
 
     const response = await sendPasswordMail(firstName, email, password);
-    console.log({ response });
 
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
@@ -64,10 +62,8 @@ export const loginUser = async (req: Request, res: Response) => {
   }
 
   try {
-    // Extract parts of the password (assuming known format)
     const mobilePart = password.slice(4);
 
-    // Find user by parts extracted from password
     const user = await User.findOne({
       mobile: mobilePart,
     });
@@ -78,7 +74,6 @@ export const loginUser = async (req: Request, res: Response) => {
         .json({ message: "Invalid first name or password" });
     }
 
-    // Verify password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res

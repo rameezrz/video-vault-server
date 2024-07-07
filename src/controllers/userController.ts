@@ -42,17 +42,14 @@ export const getUser = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { userId } = req.params;
 
-    // Fetch user profile excluding the password field
     const user = await User.findById(userId).select("-password").lean();
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Fetch all videos uploaded by the user
     const videos = await Video.find({ userId }).lean();
 
-    // Combine user profile and videos into a single response object
     const userProfile = {
       ...user,
       videos,

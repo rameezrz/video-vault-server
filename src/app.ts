@@ -11,7 +11,6 @@ app.use(cookieParser());
 app.use(cors());
 app.use(express.json());
 
-// Routes
 import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
 import videoRoutes from "./routes/videoRoutes";

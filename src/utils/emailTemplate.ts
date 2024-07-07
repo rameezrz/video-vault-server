@@ -5,7 +5,7 @@ export const emailTemplate = (firstName: string, password: string): string => {
     theme: "default",
     product: {
       name: "Video Vault",
-      link: "https://video-vault-client.vercel.app", // Replace with your application link
+      link: "https://video-vault-client.vercel.app",
     },
   });
 
@@ -18,7 +18,7 @@ export const emailTemplate = (firstName: string, password: string): string => {
         button: {
           color: "#22BC66",
           text: "Log In Here",
-          link: "https://video-vault-client.vercel.app/login",
+          link: "https://video-vault-client.vercel.app",
         },
       },
       outro:
