@@ -13,9 +13,13 @@ app.use(express.json());
 
 // Routes
 import authRoutes from "./routes/authRoutes";
+import userRoutes from "./routes/userRoutes";
+
 app.get("/", (req, res) => {
   res.status(200).send("Welcome to Video-Vault API...");
 });
+
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
 
 export default app;

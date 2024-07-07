@@ -94,25 +94,28 @@ export const loginUser = async (req: Request, res: Response) => {
     const accessToken = generateAccessToken(user._id.toString());
     const refreshToken = generateRefreshToken(user._id.toString());
 
-    // Set access token in response headers
-    res.setHeader("Authorization", `Bearer ${accessToken}`);
+    const userResponse = {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      mobile: user.mobile,
+      avatar: user?.avatar || "",
+      bio: user?.bio || "",
+    };
 
-    // Set refresh token as httpOnly, secure cookie
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: ENV.NODE_ENV === "production", // Set to true in production
-      sameSite: "strict",
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    res.status(200).json({
+      message: "Logged in successfully",
+      user: userResponse,
+      accessToken,
+      refreshToken,
     });
-
-    res.status(200).json({ message: "Logged in successfully", user });
   } catch (error) {
     res.status(500).json({ message: "Error logging in user", error });
   }
 };
 
 export const refreshAccessToken = async (req: Request, res: Response) => {
-  const refreshToken = req.cookies.refreshToken;
+  const { refreshToken } = req.body;
 
   if (!refreshToken) {
     return res.status(401).json({ message: "Refresh token not provided" });
@@ -129,9 +132,11 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
     }
 
     const newAccessToken = generateAccessToken(user._id.toString());
+    const newRefreshToken = generateRefreshToken(user._id.toString());
 
-    res.setHeader("Authorization", `Bearer ${newAccessToken}`);
-    res.status(200).json({ accessToken: newAccessToken });
+    res
+      .status(200)
+      .json({ accessToken: newAccessToken, refreshToken: newRefreshToken });
   } catch (error) {
     res
       .status(403)
