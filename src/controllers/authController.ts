@@ -4,12 +4,11 @@ import jwt from "jsonwebtoken";
 import User from "../models/User";
 import { generateAccessToken, generateRefreshToken } from "../utils/token";
 import { ENV } from "../config/env";
-// import { sendWelcomeEmail } from '../utils/mailer';
+import { sendPasswordMail } from "../services/emailService";
 
 export const registerUser = async (req: Request, res: Response) => {
   let { firstName, lastName, email, mobile } = req.body;
 
-  // Validate input
   if (!firstName || !lastName || !email || !mobile) {
     return res.status(400).json({ message: "All fields are required" });
   }
@@ -23,7 +22,6 @@ export const registerUser = async (req: Request, res: Response) => {
   email = email.trim().toLowerCase();
 
   try {
-    // Check if a user with the same email or mobile number already exists
     const existingUser = await User.findOne({ $or: [{ email }, { mobile }] });
     if (existingUser) {
       return res.status(400).json({
@@ -31,13 +29,11 @@ export const registerUser = async (req: Request, res: Response) => {
       });
     }
 
-    // Generate a password based on parts of firstName, lastName, and mobile number
     const password = `${firstName.slice(0, 2)}${lastName.slice(-2)}${mobile}`;
     console.log(`Generated password: ${password}`);
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create new user instance
     const newUser = new User({
       firstName,
       lastName,
@@ -46,11 +42,10 @@ export const registerUser = async (req: Request, res: Response) => {
       password: hashedPassword,
     });
 
-    // Save the new user to the database
     await newUser.save();
 
-    // Send welcome email with the generated password
-    //   await sendWelcomeEmail(email, firstName, password);
+    const response = await sendPasswordMail(firstName, email, password);
+    console.log({ response });
 
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
