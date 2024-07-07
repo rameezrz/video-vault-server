@@ -1,6 +1,7 @@
 import { Response } from "express";
 import { AuthenticatedRequest } from "../types/user";
 import Video from "../models/Video";
+import User from "../models/User";
 
 export const uploadVideo = async (req: AuthenticatedRequest, res: Response) => {
   const { userId } = req.user;
@@ -41,5 +42,28 @@ export const getUserVideos = async (
     });
   } catch (error) {
     res.status(500).json({ message: "Error fetching videos", error });
+  }
+};
+
+export const getAllVideos = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
+  try {
+    const users = await User.find().select("-password").lean();
+
+    const usersWithVideos = await Promise.all(
+      users.map(async (user) => {
+        const videos = await Video.find({ userId: user._id }).limit(5).lean();
+        return {
+          ...user,
+          videos,
+        };
+      })
+    );
+
+    res.status(200).json(usersWithVideos);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching users and videos", error });
   }
 };

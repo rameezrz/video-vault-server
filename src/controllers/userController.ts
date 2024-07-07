@@ -1,6 +1,7 @@
 import { Response } from "express";
 import { AuthenticatedRequest } from "../types/user";
 import User from "../models/User";
+import Video from "../models/Video";
 
 export const saveAvatar = async (req: AuthenticatedRequest, res: Response) => {
   const { userId } = req.user;
@@ -34,5 +35,33 @@ export const addBio = async (req: AuthenticatedRequest, res: Response) => {
     });
   } catch (error) {
     res.status(403).json({ message: "Error Saving Bio", error });
+  }
+};
+
+export const getUser = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { userId } = req.params;
+
+    // Fetch user profile excluding the password field
+    const user = await User.findById(userId).select("-password").lean();
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Fetch all videos uploaded by the user
+    const videos = await Video.find({ userId }).lean();
+
+    // Combine user profile and videos into a single response object
+    const userProfile = {
+      ...user,
+      videos,
+    };
+
+    res.status(200).json(userProfile);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error fetching user profile and videos", error });
   }
 };
